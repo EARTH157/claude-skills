@@ -6,6 +6,7 @@ Works with any agent that reads `SKILL.md`, not just Claude Code.
 | Skill | Purpose |
 |---|---|
 | `lean-context` | Cut token usage on large-codebase tasks without losing accuracy |
+| `pr-description` | Write a bilingual EN/TH pull request description, tiered Patch/Minor/Major |
 
 ## Install
 
