@@ -4,7 +4,7 @@ description: Write a bilingual English + Thai pull request description, classifi
 license: MIT
 metadata:
   author: EARTH157
-  version: "1.2"
+  version: "1.3"
 ---
 
 # PR Description
@@ -148,6 +148,39 @@ git tag --sort=-v:refname | head -1
 Match the existing tag format exactly - if the repo tags `1.4.2`, do not switch to
 `v1.4.2`. If there are no tags at all, ask what the first version should be.
 
+### Bump the manifest first
+
+A tag points at a commit. If the version manifest still says the old number when the tag
+is cut, the released commit contradicts its own release - and fixing that means moving a
+tag other people have already fetched. Bump, commit, and push **before**
+`gh release create`.
+
+Find the manifest the repo actually uses. Never create one that does not exist:
+
+| Ecosystem | File | Field |
+|---|---|---|
+| Node | `package.json` | `version` |
+| Python | `pyproject.toml` | `project.version` |
+| Rust | `Cargo.toml` | `package.version` |
+| Claude Code plugin | `.claude-plugin/plugin.json` | `version` |
+| Go | none - the tag *is* the version | skip this step |
+
+Rules:
+
+- Write the bare version, no `v` prefix. The `v` belongs to the tag, not the manifest.
+- If several files declare a version, bump them all in one commit. If they disagree with
+  each other before you start, stop and say so - that is a pre-existing bug, not yours to
+  silently resolve.
+- Never hand-edit a lockfile. Use the ecosystem's own command when there is one
+  (`npm version <x> --no-git-tag-version`, `cargo set-version <x>`).
+- Commit the bump on its own, message `Release v<x>`, and push it.
+
+Then confirm the tag landed on the bumped commit:
+
+```bash
+git show <tag>:<manifest> | grep -i version
+```
+
 ### Create it
 
 Write the bilingual body to a temp file, then:
@@ -168,6 +201,7 @@ The same file serves the PR: `gh pr create --body-file <temp-file>`.
 - Claim a fix works when the PR has no test or verification for it.
 - Upgrade the tier to make the PR sound bigger, or downgrade it to avoid a migration note.
 - Create, tag, or push a release the user did not ask for.
+- Cut a tag before the version bump is committed and pushed.
 - Invent a version number instead of reading the current one.
 
 Worked examples for all three tiers: [references/examples.md](references/examples.md).
