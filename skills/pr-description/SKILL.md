@@ -1,10 +1,10 @@
 ---
 name: pr-description
-description: Write a bilingual English + Thai pull request description, classified as Patch Note, Minor Update, or Major Update, containing only the sections that actually apply - What's new, Changed, and Bug fix. Use whenever the user wants a PR description, PR body, PR summary, release note, patch note, or changelog entry, including phrasings like "เขียน PR ให้หน่อย", "สรุป PR", "ทำ release note", "เปิด PR", or when they are about to run gh pr create. Also use when updating or rewriting an existing PR description.
+description: Write a bilingual English + Thai pull request description, classified as Patch Note, Minor Update, or Major Update, containing only the sections that actually apply - What's new, Changed, and Bug fix. Use whenever the user wants a PR description, PR body, PR summary, release note, patch note, or changelog entry, including phrasings like "เขียน PR ให้หน่อย", "สรุป PR", "ทำ release note", "เปิด PR", or when they are about to run gh pr create. Also covers cutting the matching GitHub release, deriving the version bump from the tier. Use it when they ask to create a release, tag a version, or say "สร้าง release" or "ออกเวอร์ชันใหม่", and when updating or rewriting an existing PR description.
 license: MIT
 metadata:
   author: EARTH157
-  version: "1.1"
+  version: "1.2"
 ---
 
 # PR Description
@@ -120,10 +120,54 @@ from the top. The Thai block is the same content in full, not a summary.
   `migration`, API names, file paths. That is how Thai developers actually write.
 - Tier label and section headings are fixed strings. Do not translate the tier label.
 
+## Step 5 - Cut the release (only when asked)
+
+A release publishes a tag and notes that other people and tooling will fetch, and a
+pulled tag is awkward to undo. **Never create one unprompted.** Do it only when the user
+asks, and only after showing them the version number and the body you intend to publish.
+
+### The tier already chose the bump
+
+| Tier | Bump | `1.4.2` becomes |
+|---|---|---|
+| Patch Note | patch | `1.4.3` |
+| Minor Update | minor | `1.5.0` |
+| Major Update | major | `2.0.0` |
+
+**Below 1.0, shift every bump down one place**: a Major Update takes `0.4.2` to `0.5.0`,
+a Minor Update takes it to `0.4.3`. Moving to `1.0.0` is the user's decision, never one
+you infer from the diff.
+
+Read the current version, do not assume it:
+
+```bash
+gh release list --limit 1
+git tag --sort=-v:refname | head -1
+```
+
+Match the existing tag format exactly - if the repo tags `1.4.2`, do not switch to
+`v1.4.2`. If there are no tags at all, ask what the first version should be.
+
+### Create it
+
+Write the bilingual body to a temp file, then:
+
+```bash
+gh release create v1.5.0 --title "v1.5.0" --notes-file <temp-file>
+```
+
+- `--draft` when the user wants to review it on GitHub before it goes public.
+- `--prerelease` for anything not meant for general use.
+- Drop the tier label line from the release body. The version number already says it.
+
+The same file serves the PR: `gh pr create --body-file <temp-file>`.
+
 ## Do not
 
 - Guess at a change you did not read in the diff.
 - Claim a fix works when the PR has no test or verification for it.
 - Upgrade the tier to make the PR sound bigger, or downgrade it to avoid a migration note.
+- Create, tag, or push a release the user did not ask for.
+- Invent a version number instead of reading the current one.
 
 Worked examples for all three tiers: [references/examples.md](references/examples.md).
