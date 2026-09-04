@@ -4,7 +4,7 @@ description: Cut token usage on large-codebase tasks without losing accuracy - t
 license: MIT
 metadata:
   author: EARTH157
-  version: "0.2"
+  version: "0.3"
 ---
 
 # Lean Context
@@ -54,6 +54,27 @@ Every read should survive the sentence: "I need lines X-Y of this file because Z
 - Once you know the line number, read a window around it instead of the whole file.
 - Do not re-read a file you already read this session unless it changed outside your edits.
 - Do not read a file back to "verify" an edit that returned success. Edit failures are loud.
+
+### When a search comes back empty
+
+An empty result is information: your guess at this codebase's vocabulary was wrong.
+Do not answer it by reading the whole file, and do not fire off three more guesses.
+
+Probe the file's structure first - one cheap search for the anchors every file has:
+
+```bash
+grep -nE '^(import|export|from|func |class |def |const [A-Z])' <file>
+```
+
+That returns the file's own vocabulary - what it pulls in, what it hands out - in a few
+hundred bytes. Draw your next search term from that, not from memory.
+
+Measured on a 1350-line React component: a wrong search, a structural probe, then a
+correct search cost 6.2 KB over three round trips. Reading the file cost 49.6 KB in one.
+Guessing wrong and recovering is still eight times cheaper than not searching.
+
+Two probes with no hits means the thing may not be in this file. Widen to the directory
+before concluding anything about it.
 
 ## Command output
 
