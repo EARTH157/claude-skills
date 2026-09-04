@@ -1,10 +1,10 @@
 ---
 name: pr-description
-description: Write a bilingual English + Thai pull request description, classified as Patch Note, Minor Update, or Major Update, containing only the sections that actually apply - What's new and Bug fix. Use whenever the user wants a PR description, PR body, PR summary, release note, patch note, or changelog entry, including phrasings like "เขียน PR ให้หน่อย", "สรุป PR", "ทำ release note", "เปิด PR", or when they are about to run gh pr create. Also use when updating or rewriting an existing PR description.
+description: Write a bilingual English + Thai pull request description, classified as Patch Note, Minor Update, or Major Update, containing only the sections that actually apply - What's new, Changed, and Bug fix. Use whenever the user wants a PR description, PR body, PR summary, release note, patch note, or changelog entry, including phrasings like "เขียน PR ให้หน่อย", "สรุป PR", "ทำ release note", "เปิด PR", or when they are about to run gh pr create. Also use when updating or rewriting an existing PR description.
 license: MIT
 metadata:
   author: EARTH157
-  version: "1.0"
+  version: "1.1"
 ---
 
 # PR Description
@@ -42,15 +42,29 @@ Size is not the signal; consequence is.
 
 ## Step 3 - Pick sections
 
-Only two sections exist: **What's new** and **Bug fix**.
+Three sections exist: **What's new**, **Changed**, **Bug fix**. Route every bullet with
+one question - *was the old behavior wrong?*
 
-- New capability only → `What's new` alone.
-- Fixes only → `Bug fix` alone.
-- Both → both, `What's new` first.
+| The bullet describes | Section |
+|---|---|
+| Something that did not exist before | `What's new` |
+| Something that existed, works differently now, and the old way was not a defect | `Changed` |
+| Something that existed, was wrong, and is now correct | `Bug fix` |
+
+Emit any combination - one section, two, or all three. Order is always
+`What's new` → `Changed` → `Bug fix`.
 
 **Never emit an empty section, and never write "N/A" or "None".** Omit it.
 
-For a Major Update, breaking changes go in `What's new`, each led by what the reader
+`Changed` is the section that rots first. It is not a home for refactors, renamed
+internals, or dependency bumps. If a user cannot perceive the difference, it still gets
+no bullet.
+
+### Breaking changes
+
+Mark them `**Breaking**` and put them in whichever section the change belongs to - usually
+`Changed`, since breaking something almost always means altering what already existed.
+List `**Breaking**` bullets first within their section, and lead with what the reader
 must do:
 
 ```
@@ -67,12 +81,18 @@ Format:
 ## What's new
 - ...
 
+## Changed
+- ...
+
 ## Bug fix
 - ...
 
 ---
 
 ## มีอะไรใหม่
+- ...
+
+## ปรับปรุง
 - ...
 
 ## แก้บั๊ก
