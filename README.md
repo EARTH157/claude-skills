@@ -7,6 +7,7 @@ Works with any agent that reads `SKILL.md`, not just Claude Code.
 |---|---|
 | `lean-context` | Cut token usage on large-codebase tasks without losing accuracy |
 | `pr-description` | Write a bilingual EN/TH PR description, tiered Patch/Minor/Major, and cut the matching release |
+| `debug` | Investigate a bug on the cheapest surface that can observe it, then narrow by elimination |
 
 ## Install
 
