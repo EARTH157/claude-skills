@@ -1,76 +1,63 @@
 # claude-skills
 
-Agent Skills ส่วนตัว เขียนตาม [Agent Skills open standard](https://agentskills.io)
-ใช้ได้กับ agent ที่รองรับ `SKILL.md` ทุกตัว ไม่ผูกกับ Claude Code
+Personal Agent Skills, written to the [Agent Skills open standard](https://agentskills.io).
+Works with any agent that reads `SKILL.md`, not just Claude Code.
 
-## Skills
-
-| Skill | ทำอะไร |
+| Skill | Purpose |
 |---|---|
-| `lean-context` | ลดการใช้ token ในงานที่ต้องอ่านโค้ดเยอะ โดยไม่ลดคุณภาพงาน |
+| `lean-context` | Cut token usage on large-codebase tasks without losing accuracy |
 
-## ติดตั้ง
+## Install
 
-### Claude Code (ผ่าน plugin marketplace)
+**Claude Code** — this repo is also its own plugin marketplace:
 
 ```
 /plugin marketplace add EARTH157/claude-skills
 /plugin install toolkit@claude-skills
 ```
 
-อัปเดตทีหลังด้วย `/plugin marketplace update claude-skills`
+Update later with `/plugin marketplace update claude-skills`.
 
-### Agent อื่น ๆ (Cursor, Codex, Gemini CLI, ...)
-
-spec กำหนดแค่ *รูปแบบไฟล์* ไม่ได้กำหนดว่า client ต้องหา skill ที่ไหน
-แต่ละตัวเลยมี directory ของตัวเอง สคริปต์นี้สร้าง junction จาก directory
-ของแต่ละเครื่องมือมาที่ repo นี้ — source of truth เดียว แก้ที่นี่ที่เดียวเห็นทุกตัว
+**Other agents** (Cursor, Codex, Gemini CLI, ...) — the spec defines the file format,
+not where clients look for skills, so each tool has its own directory. `install.ps1`
+junctions those directories to this repo, keeping one source of truth:
 
 ```powershell
-.\install.ps1 -WhatIf   # ดูก่อนว่าจะทำอะไรบ้าง
-.\install.ps1           # ลงให้เฉพาะเครื่องมือที่ติดตั้งอยู่แล้ว
+.\install.ps1 -WhatIf   # preview
+.\install.ps1           # link into tools already installed
 ```
 
-junction บน Windows ไม่ต้องใช้สิทธิ์ admin
-ตาราง path อยู่ต้นไฟล์ `install.ps1` แก้ได้ตามต้องการ
+Junctions need no admin rights. Paths are a table at the top of `install.ps1`;
+each line links to that tool's docs, since these paths move.
 
-> path ของแต่ละเครื่องมือเปลี่ยนได้เรื่อย ๆ — ในสคริปต์มีลิงก์ docs กำกับไว้ทุกบรรทัด
-> ควรเช็คก่อนถ้าเครื่องมือไหนไม่ยอมโหลด
-
-## โครงสร้าง
+## Layout
 
 ```
-.claude-plugin/        # เฉพาะ Claude Code — เครื่องมืออื่นไม่สนใจโฟลเดอร์นี้
-  plugin.json
-  marketplace.json
-skills/                # ตัวเนื้อจริง พกพาได้ตาม spec
-  <skill-name>/
-    SKILL.md           # บังคับ — frontmatter + คำสั่ง
-    references/        # โหลดเมื่อจำเป็นเท่านั้น
-install.ps1            # ลิงก์ skills/ เข้า agent ตัวอื่นบนเครื่องนี้
+.claude-plugin/        # Claude Code only; other tools ignore it
+skills/<name>/
+  SKILL.md             # required: frontmatter + instructions
+  references/          # loaded on demand
+install.ps1
 ```
 
-## เพิ่ม skill ใหม่
+## Adding a skill
 
-1. `mkdir skills/<name>` แล้วสร้าง `SKILL.md`
-2. frontmatter บังคับ 2 ฟิลด์: `name` (ต้องตรงกับชื่อโฟลเดอร์ ตัวพิมพ์เล็ก/ตัวเลข/ขีดกลาง ห้ามขีดคู่) และ `description` (ไม่เกิน 1024 ตัวอักษร)
-3. `description` คือสิ่งเดียวที่ agent เห็นตอนยังไม่โหลด skill — ต้องบอกทั้ง *ทำอะไร* และ *เมื่อไหร่ใช้* พร้อมคำที่ผู้ใช้จะพิมพ์จริง
-4. เก็บ `SKILL.md` ให้ต่ำกว่า 500 บรรทัด รายละเอียดยาว ๆ ย้ายไป `references/`
-5. `npx skills-ref validate ./skills/<name>` แล้ว commit + push
+1. Create `skills/<name>/SKILL.md`.
+2. Required frontmatter: `name` (must match the directory; lowercase, digits, single
+   hyphens) and `description` (≤1024 chars).
+3. `description` is all an agent sees before loading the skill. State what it does,
+   when to use it, and the words a user would actually type.
+4. Keep `SKILL.md` under 500 lines; move detail into `references/`.
+5. Validate with `npx skills-ref validate ./skills/<name>`.
 
-### เขียนให้พกพาได้
+**Keep it portable.** Name operations, not one harness's tools — write "content search",
+not `Grep`. Put tool-specific detail in `references/<tool>.md`, as `lean-context` does
+with `claude-code.md`.
 
-อย่าอ้างชื่อ tool ของ harness ใด harness หนึ่งใน `SKILL.md` (`Grep`, `/context`, ...)
-ให้อธิบายเป็น *การกระทำ* แล้วยกชื่อจริงเป็นตัวอย่าง ถ้ามีเนื้อหาเฉพาะเครื่องมือจริง ๆ
-แยกไปไว้ใน `references/<tool>.md` แบบที่ `lean-context` ทำกับ `claude-code.md`
-
-> `SKILL.md` เขียนเป็นภาษาอังกฤษโดยตั้งใจ — เป็น instruction ที่โมเดลอ่าน ไม่ใช่เอกสารสำหรับคน
-> และกินโทเคนน้อยกว่าภาษาไทยราวครึ่งหนึ่งที่เนื้อหาเท่ากัน
-
-## ทดสอบก่อน push
+## Testing before push
 
 ```
 /plugin marketplace add C:/Users/Jirapat Chumaungphan/Documents/claude-skills
 ```
 
-local marketplace อ่านจากดิสก์ตรง ๆ แก้ `SKILL.md` แล้วเปิด session ใหม่ก็เห็นผลทันที
+A local marketplace reads from disk, so edits show up in the next session with no commit.
