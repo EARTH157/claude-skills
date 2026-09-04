@@ -58,7 +58,7 @@ with `claude-code.md`.
 ## Testing before push
 
 ```
-/plugin marketplace add C:/Users/Jirapat Chumaungphan/Documents/claude-skills
+/plugin marketplace add /path/to/claude-skills
 ```
 
 A local marketplace reads from disk, so edits show up in the next session with no commit.
