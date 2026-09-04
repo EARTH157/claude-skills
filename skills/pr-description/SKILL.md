@@ -4,7 +4,7 @@ description: Write a bilingual English + Thai pull request description, classifi
 license: MIT
 metadata:
   author: EARTH157
-  version: "1.3"
+  version: "1.4"
 ---
 
 # PR Description
@@ -135,8 +135,14 @@ asks, and only after showing them the version number and the body you intend to 
 | Major Update | major | `2.0.0` |
 
 **Below 1.0, shift every bump down one place**: a Major Update takes `0.4.2` to `0.5.0`,
-a Minor Update takes it to `0.4.3`. Moving to `1.0.0` is the user's decision, never one
-you infer from the diff.
+a Minor Update takes it to `0.4.3`. This keeps a pre-1.0 project from spending its minor
+numbers before the API is stable. Moving to `1.0.0` is the user's decision, never one you
+infer from the diff.
+
+**Propose the computed version, do not announce it.** If the user names a different one,
+use theirs without arguing - state once what the rule would have given, then carry on.
+The next release computes from whatever was actually published, not from what the rule
+would have produced.
 
 Read the current version, do not assume it:
 
