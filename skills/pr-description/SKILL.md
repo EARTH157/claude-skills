@@ -4,7 +4,7 @@ description: Write a bilingual English + Thai pull request description, classifi
 license: MIT
 metadata:
   author: EARTH157
-  version: "1.4"
+  version: "1.5"
 ---
 
 # PR Description
@@ -24,6 +24,13 @@ git diff --stat <base>..HEAD
 Read full diffs only for files whose user-visible effect you cannot infer from the
 stat line. Commit messages describe intent; the diff confirms it. Trust neither alone.
 
+**If the commits carry Conventional Commits types, they have already done most of this
+work.** `feat:`, `fix:` and a `!` or `BREAKING CHANGE:` footer give you the section and
+the tier without opening a single diff - which is the whole point of committing as you
+go and deciding about the release later. Read the log first, and fall back to diffs only
+for commits with no type, or where the subject line is too vague to place. See the
+`commit-message` skill for the mapping.
+
 ## Step 2 - Classify the tier
 
 Work top-down and stop at the first match:
@@ -36,6 +43,11 @@ Work top-down and stop at the first match:
 
 Deciding rule: **does anyone have to change what they do?** Yes → Major.
 No, but there is something new → Minor. Otherwise → Patch Note.
+
+With typed commits this is arithmetic, not judgement: any `!` or `BREAKING CHANGE:` in
+the range → Major. Otherwise any `feat:` → Minor. Otherwise → Patch Note. Verify the
+result against the diff before trusting it - a mistyped commit is common, and a `feat:`
+that only touched tests is not a Minor Update.
 
 A PR full of bug fixes is a Patch Note no matter how many files it touches.
 Size is not the signal; consequence is.
