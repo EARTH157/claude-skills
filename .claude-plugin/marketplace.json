@@ -1,0 +1,13 @@
+{
+  "name": "claude-skills",
+  "owner": {
+    "name": "Jirapat Chumaungphan"
+  },
+  "plugins": [
+    {
+      "name": "toolkit",
+      "source": "./",
+      "description": "Personal Claude Code skills: working habits and reusable workflows."
+    }
+  ]
+}
